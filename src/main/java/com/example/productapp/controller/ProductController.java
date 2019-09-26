@@ -7,8 +7,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -41,4 +46,16 @@ public class ProductController {
     public Product addProduct(@Valid @RequestBody ProductRequest productRequest) {
         return productService.addProduct(productRequest);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<Error> handleConflict(MethodArgumentNotValidException ex, WebRequest request) {
+        return ResponseEntity.badRequest().body(new Error("The provided input is not valid."));
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public class Error {
+        private String message;
+    }
+
 }
